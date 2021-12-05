@@ -37,7 +37,6 @@ print(X_train.shape, X_test.shape)
 sel = VarianceThreshold(threshold=0.01) #threshold = 0 for constant only
 sel.fit(X_train)  #finds features w low variance
 
-
 #get number of features constant (get_support is bool vector rep constant features)
 X_train = X[:4874]
 sum(sel.get_support())
