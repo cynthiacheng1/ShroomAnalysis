@@ -12,7 +12,7 @@ from sklearn import svm
 #csv into dataframe
 df = pd.read_csv("mushrooms.csv")
 df = df.dropna(axis=1)
-print(df.shape)
+# print(df.shape)
 
 #converting chars in dataset to ints 
 def to_digit(i):
@@ -30,8 +30,8 @@ for idx in list(df.columns):
 X = df.loc[ : , df.columns != 'class']
 y = np.array(df['class'])
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.5)
-print( X_train.shape, X_test.shape)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.4)
+# print( X_train.shape, X_test.shape)
 
 
 #removing constant and quasi constant features with sklearn variancethreshold 
@@ -41,16 +41,16 @@ sel.fit(X_train)  #finds features w low variance
 #get number of features constant (get_support is bool vector rep constant features)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 sum(sel.get_support())
-print(len([x for x in X_train.columns if x not in X_train.columns[sel.get_support()]]))
+# print(len([x for x in X_train.columns if x not in X_train.columns[sel.get_support()]]))
 
 # print the features removed 
-print([x for x in X_train.columns if x not in X_train.columns[sel.get_support()]])
+# print([x for x in X_train.columns if x not in X_train.columns[sel.get_support()]])
 #result : ['gill-attachment', 'veil-type', 'veil-color', 'ring-number']
 
 X_train = sel.transform(X_train)
 X_test = sel.transform(X_test)
 
-print( X_train.shape, X_test.shape)
+# print( X_train.shape, X_test.shape)
 
 
 
@@ -78,14 +78,14 @@ for c in cVals:
     print(c)
     svm_linear_l1(c)
 
-
 plt.plot(c_svm_linear,acc_train_svm_linear)
 plt.plot(c_svm_linear,acc_test_svm_linear)
-
-
-# Use the following function to have a legend
+plt.title("Linear SVM with L1 Reg")
+plt.xlabel("C")
+plt.ylabel("Accuracy")
+plt.xlim([0, 10])
 plt.legend(['Training Accuracy', 'Test Accuracy'], loc='lower right')
-# plt.show()
+plt.show()
 
 #linear_svm with L2 reg 
 acc_train_svm_linear = []
@@ -106,7 +106,7 @@ def svm_linear_l2(c):
     c_svm_linear.append(c)
 
 print("Linear SVM with L2 Reg")
-cVals = [0.0001, 0.001, 0.01, 0.1, 1, 10,100]
+cVals = [0.0001, 0.001, 0.01, 0.1, 1, 10]
 for c in cVals:
     print(c)
     svm_linear_l2(c)
@@ -114,12 +114,12 @@ for c in cVals:
 
 plt.plot(c_svm_linear,acc_train_svm_linear)
 plt.plot(c_svm_linear,acc_test_svm_linear)
-
-
-# Use the following function to have a legend
+plt.title("Linear SVM with L2 Reg")
+plt.xlabel("C")
+plt.ylabel("Accuracy")
+plt.xlim([0, 10])
 plt.legend(['Training Accuracy', 'Test Accuracy'], loc='lower right')
-# plt.show()
-
+plt.show()
 
 
 #radial basis
@@ -141,16 +141,53 @@ def svm_rbf(c):
     c_svm_rbf.append(c)
 
 print("RBF SVM with L2 Reg")
+cVals = [0.0001, 0.001, 0.01, 0.1, 1, 10]
 for c in cVals:
     print(c)
     svm_rbf(c)
 
 plt.plot(c_svm_rbf,acc_train_svm_rbf)
 plt.plot(c_svm_rbf,acc_test_svm_rbf)
-
-
-# Use the following function to have a legend
+plt.title("SVM RBF with L2 Reg")
+plt.xlabel("C")
+plt.ylabel("Accuracy")
+plt.xlim([0, 10])
 plt.legend(['Training Accuracy', 'Test Accuracy'], loc='lower right')
-# plt.show()
+plt.show()
 
+acc_train_svm_poly = []
+acc_test_svm_poly = []
+c_svm_poly = []
 
+def svm_polynomial(c):
+    svc_polynomial = svm.SVC(probability=False, kernel = 'poly', C=c)  
+    A = X_train
+    B = y_train  
+    C = X_test
+    D = y_test
+    svc_polynomial.fit(A,B)
+    Yhat_svc_poly_train = svc_polynomial.predict(A)
+    acc_train = svc_polynomial.score(A,B)
+    acc_train_svm_poly.append(acc_train)
+    print('Train Accuracy = {0:f}'.format(acc_train))
+    Yhat_svc_poly_test = svc_polynomial.predict(C)
+    acc_test = svc_polynomial.score(C,D)
+    acc_test_svm_poly.append(acc_test)
+    print('Test Accuracy = {0:f}'.format(acc_test))
+    c_svm_poly.append(c)
+
+print("svm poly L2 reg")
+# cVals = np.geomspace(0.000001, 0.001, 5)
+cVals = [0.0001, 0.001, 0.01, 0.1, 1, 10]
+for c in cVals:
+    print(c)
+    svm_polynomial(c)
+
+plt.plot(c_svm_poly,acc_train_svm_poly)
+plt.plot(c_svm_poly,acc_test_svm_poly)
+plt.title("SVM poly with L2 Reg")
+plt.xlabel("C")
+plt.ylabel("Accuracy")
+plt.xlim([0, 10])
+plt.legend(['Training Accuracy', 'Test Accuracy'], loc='upper right')
+plt.show()
